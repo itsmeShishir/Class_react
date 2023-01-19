@@ -64,9 +64,11 @@ function App() {
   const handleUpdate = (id) => {
     const note = notes.find(note => note.id === id)
     const updatedNote = { ...note, important: !note.important }
-    alert(updatedNote)
+    alert(updatedNote.important)
     axios.put(`http://localhost:3001/notes/${id}`, updatedNote)
+
       .then(res => {
+        // axios.put(`http://localhost:3001/notes/${id}`, updatedNote)
         setNotes(notes.map(note => note.id !== id ? note : res.data))
       })
       .catch(err => console.log(err))
