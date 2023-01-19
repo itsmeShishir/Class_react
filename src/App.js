@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import axios from 'axios';
+// import axios from 'axios';
 import Note from "./Component/Note";
-
+import notService from "./services/notService";
 function App() {
 
   const [notes, setNotes] = useState([]);
@@ -10,7 +10,7 @@ function App() {
 
 
   useEffect(() => {
-    axios.get('http://localhost:3001/notes')
+    notService.getAllNotes()
       .then(res => {
         setNotes(res.data)
       })
@@ -42,7 +42,7 @@ function App() {
       important: Math.random() < 0.5,
     }
     if (newNote !== '') {
-      axios.post('http://localhost:3001/notes', note)
+      notService.createNote(note)
         .then(res => {
           setNotes(notes.concat(res.data))
           console.log(res)
@@ -52,21 +52,20 @@ function App() {
   }
 
   const handleDelete = async (id) => {
-    alert(id)
-    try {
-      await axios.delete(`http://localhost:3001/notes/${id}`)
-      setNotes(notes.filter(note => note.id !== id))
-    } catch (err) {
-      console.log(err)
+    if (window.confirm(`Are you ok deleting this item? ${id}`)) {
+      try {
+        await notService.deleteNote(id)
+        setNotes(notes.filter(note => note.id !== id))
+      } catch (err) {
+        console.log(err)
+      }
     }
   }
-
   const handleUpdate = (id) => {
     const note = notes.find(note => note.id === id)
     const updatedNote = { ...note, important: !note.important }
     alert(updatedNote.important)
-    axios.put(`http://localhost:3001/notes/${id}`, updatedNote)
-
+    notService.changeImportance(id, updatedNote)
       .then(res => {
         // axios.put(`http://localhost:3001/notes/${id}`, updatedNote)
         setNotes(notes.map(note => note.id !== id ? note : res.data))
